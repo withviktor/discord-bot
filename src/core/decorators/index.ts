@@ -5,4 +5,5 @@ export type { EventOptions } from "./event.decorator.js";
 export { Injectable } from "./injectable.decorator.js";
 export { Module } from "./module.decorator.js";
 export type { ModuleOptions } from "./module.decorator.js";
+export { RequirePermissions } from "./require-permissions.decorator.js";
 export { inject as Inject } from "tsyringe";

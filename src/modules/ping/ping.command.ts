@@ -19,7 +19,7 @@ export class PingCommand implements ICommand {
 
     await interaction.reply({
       content: `Pong! Latency: \`${latency}ms\``,
-      flags: MessageFlags.Ephemeral
+      flags: MessageFlags.Ephemeral,
     });
   }
 }

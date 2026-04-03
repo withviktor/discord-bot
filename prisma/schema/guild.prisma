@@ -1,0 +1,7 @@
+model Guild {
+  id        String   @id // Discord guild (server) snowflake ID
+  name      String
+  active    Boolean  @default(true)
+  joinedAt  DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

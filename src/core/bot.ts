@@ -1,12 +1,21 @@
-import { Client, GatewayIntentBits, REST, Routes, SlashCommandBuilder } from "discord.js";
+import {
+  Client,
+  GatewayIntentBits,
+  type PermissionResolvable,
+  REST,
+  Routes,
+  SlashCommandBuilder,
+} from "discord.js";
 import { container } from "tsyringe";
 import { env } from "../env.js";
 import { COMMAND_METADATA_KEY } from "./decorators/command.decorator.js";
 import { EVENT_METADATA_KEY } from "./decorators/event.decorator.js";
-import { MODULE_METADATA_KEY } from "./decorators/module.decorator.js";
 import type { ModuleOptions } from "./decorators/module.decorator.js";
+import { MODULE_METADATA_KEY } from "./decorators/module.decorator.js";
+import { PERMISSIONS_METADATA_KEY } from "./decorators/require-permissions.decorator.js";
 import type { ICommand } from "./interfaces/command.interface.js";
 import type { IEvent } from "./interfaces/event.interface.js";
+import type { OnBotDestroy, OnBotInit } from "./interfaces/lifecycle.interface.js";
 
 // biome-ignore lint/suspicious/noExplicitAny: constructor type requires any
 type Constructor = new (...args: any[]) => unknown;
@@ -31,11 +40,16 @@ export class BotClient {
   async bootstrap(): Promise<void> {
     const resolved = this.resolveModule(this.rootModule);
 
+    // Register and initialise providers
     for (const Provider of resolved.providers) {
       container.registerSingleton(Provider);
     }
 
-    const commandMap = new Map<string, ICommand>();
+    await this.runLifecycle("onInit", resolved.providers);
+    this.registerShutdownHooks(resolved.providers);
+
+    // Build and deploy slash commands
+    const commandMap = new Map<string, { instance: ICommand; klass: Constructor }>();
     const commandData: object[] = [];
 
     for (const CommandClass of resolved.commands) {
@@ -51,9 +65,8 @@ export class BotClient {
         .setDescription(metadata.description);
 
       const finalBuilder = instance.build ? instance.build(builder) : builder;
-
       commandData.push(finalBuilder.toJSON());
-      commandMap.set(metadata.name, instance);
+      commandMap.set(metadata.name, { instance, klass: CommandClass });
     }
 
     await this.rest.put(Routes.applicationCommands(env.DISCORD_CLIENT_ID), {
@@ -62,6 +75,7 @@ export class BotClient {
 
     console.log(`Registered ${commandData.length} slash command(s).`);
 
+    // Register event handlers
     for (const EventClass of resolved.events) {
       container.registerSingleton(EventClass);
       const metadata = Reflect.getMetadata(EVENT_METADATA_KEY, EventClass) as {
@@ -79,14 +93,27 @@ export class BotClient {
       }
     }
 
+    // Route slash command interactions
     this.client.on("interactionCreate", async (interaction) => {
       if (!interaction.isChatInputCommand()) return;
 
       const command = commandMap.get(interaction.commandName);
       if (!command) return;
 
+      const requiredPerms = Reflect.getMetadata(PERMISSIONS_METADATA_KEY, command.klass) as
+        | PermissionResolvable[]
+        | undefined;
+
+      if (requiredPerms?.length && !interaction.memberPermissions?.has(requiredPerms)) {
+        await interaction.reply({
+          content: "You don't have permission to use this command.",
+          ephemeral: true,
+        });
+        return;
+      }
+
       try {
-        await command.execute(interaction);
+        await command.instance.execute(interaction);
       } catch (error) {
         console.error(`Error executing command "${interaction.commandName}":`, error);
 
@@ -103,6 +130,29 @@ export class BotClient {
     });
 
     await this.client.login(env.DISCORD_TOKEN);
+  }
+
+  private async runLifecycle(
+    hook: "onInit" | "onDestroy",
+    providers: Constructor[]
+  ): Promise<void> {
+    for (const Provider of providers) {
+      const instance = container.resolve(Provider) as Partial<OnBotInit & OnBotDestroy>;
+      if (typeof instance[hook] === "function") {
+        await instance[hook]();
+      }
+    }
+  }
+
+  private registerShutdownHooks(providers: Constructor[]): void {
+    const shutdown = async () => {
+      await this.runLifecycle("onDestroy", providers);
+      this.client.destroy();
+      process.exit(0);
+    };
+
+    process.once("SIGTERM", shutdown);
+    process.once("SIGINT", shutdown);
   }
 
   private resolveModule(
