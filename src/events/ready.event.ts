@@ -19,7 +19,9 @@ export class ReadyEvent implements IEvent {
   }
 
   async execute(client: Client<true>): Promise<void> {
+    const userCount = client.guilds.cache.reduce((sum, guild) => sum + guild.memberCount, 0);
     this.logger.info(`Logged in as ${client.user.tag}`);
+    this.logger.info(`Bot is in ${client.guilds.cache.size} guild(s) with total of ${userCount} users`);
     this.activity.refresh(client);
   }
 }

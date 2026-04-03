@@ -5,8 +5,10 @@
   "main": "dist/main.js",
   "scripts": {
     "dev": "tsx watch src/main.ts",
+    "dev:sharded": "tsx src/shard.ts",
     "build": "tsup",
     "start": "node dist/main.js",
+    "start:sharded": "node dist/shard.js",
     "lint": "biome check .",
     "format": "biome format --write .",
     "check": "biome check --write .",

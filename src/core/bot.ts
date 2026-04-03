@@ -1,6 +1,7 @@
 import {
   Client,
   GatewayIntentBits,
+  MessageFlags,
   type PermissionResolvable,
   REST,
   Routes,
@@ -72,11 +73,17 @@ export class BotClient {
       commandMap.set(metadata.name, { instance, klass: CommandClass });
     }
 
-    await this.rest.put(Routes.applicationCommands(env.DISCORD_CLIENT_ID), {
-      body: commandData,
-    });
+    // When sharding, only the first shard registers commands to avoid redundant
+    // REST calls (and the resulting timeout on subsequent shards).
+    const shardIds = this.client.shard?.ids;
+    const isCommandShard = !shardIds || shardIds[0] === 0;
 
-    this.logger.info(`Registered ${commandData.length} slash command(s).`);
+    if (isCommandShard) {
+      await this.rest.put(Routes.applicationCommands(env.DISCORD_CLIENT_ID), {
+        body: commandData,
+      });
+      this.logger.info(`Registered ${commandData.length} slash command(s).`);
+    }
 
     // Register event handlers
     for (const EventClass of resolved.events) {
@@ -110,7 +117,7 @@ export class BotClient {
       if (requiredPerms?.length && !interaction.memberPermissions?.has(requiredPerms)) {
         await interaction.reply({
           embeds: [permissionDeniedEmbed()],
-          ephemeral: true,
+          flags: MessageFlags.Ephemeral
         });
         return;
       }
