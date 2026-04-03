@@ -1,0 +1,21 @@
+model GuildSettings {
+  guildId           String   @id
+  auditLogChannelId String?
+  welcomeChannelId  String?
+  welcomeRoleId     String?
+  antiSpamEnabled   Boolean  @default(false)
+  antiInviteEnabled Boolean  @default(false)
+  wordFilterEnabled Boolean  @default(false)
+  wordFilterList      String[] @default([])
+  ticketCategoryId    String?
+  ticketSupportRoleId String?
+  ticketLogChannelId  String?
+  ticketNamingScheme  String   @default("username") // "username" | "userid" | "ticketid"
+  ticketPanelTitle    String?
+  ticketPanelDesc     String?
+  ticketButtonLabel   String?
+  ticketButtonStyle   String?  // "primary" | "secondary" | "success" | "danger"
+  updatedAt           DateTime @updatedAt
+
+  guild Guild @relation(fields: [guildId], references: [id])
+}

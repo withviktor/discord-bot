@@ -4,4 +4,8 @@ model Guild {
   active    Boolean  @default(true)
   joinedAt  DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  settings       GuildSettings?
+  cases          ModerationCase[]
+  guildTickets   GuildTicket[]
 }

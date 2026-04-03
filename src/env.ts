@@ -11,6 +11,9 @@ export const env = createEnv({
     TOTAL_SHARDS: z
       .union([z.coerce.number().positive().int(), z.literal("auto")])
       .optional(),
+    // Staff ticket system — the guild/channel where reports are posted to your team.
+    SUPPORT_GUILD_ID: z.string().optional(),
+    SUPPORT_CHANNEL_ID: z.string().optional(),
   },
   runtimeEnv: process.env,
 });

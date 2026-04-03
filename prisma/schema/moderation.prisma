@@ -1,0 +1,20 @@
+enum ModerationActionType {
+  WARN
+  KICK
+  BAN
+  TIMEOUT
+  UNBAN
+}
+
+model ModerationCase {
+  id          String               @id
+  guildId     String
+  userId      String
+  moderatorId String
+  type        ModerationActionType
+  reason      String?
+  expiresAt   DateTime?
+  createdAt   DateTime             @default(now())
+
+  guild Guild @relation(fields: [guildId], references: [id])
+}

@@ -7,5 +7,5 @@ export interface ICommand {
    * If not defined, the command is registered with only the name and description
    * from the @Command decorator.
    */
-  build?(builder: SlashCommandBuilder): SlashCommandBuilder;
+  build?(builder: SlashCommandBuilder): Pick<SlashCommandBuilder, "toJSON">;
 }

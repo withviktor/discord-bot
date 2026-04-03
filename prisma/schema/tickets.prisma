@@ -1,0 +1,44 @@
+enum TicketStatus {
+  OPEN
+  CLOSED
+}
+
+enum StaffTicketType {
+  BUG
+  MISUSE
+  FEATURE
+  OTHER
+}
+
+enum StaffTicketStatus {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+  CLOSED
+}
+
+model GuildTicket {
+  id           String       @id
+  guildId      String
+  channelId    String       @unique
+  userId       String
+  status       TicketStatus @default(OPEN)
+  closedAt     DateTime?
+  closedById   String?
+  closedReason String?
+  createdAt    DateTime     @default(now())
+
+  guild Guild @relation(fields: [guildId], references: [id])
+}
+
+model StaffTicket {
+  id          String            @id
+  userId      String
+  guildId     String?
+  type        StaffTicketType
+  status      StaffTicketStatus @default(OPEN)
+  description String
+  threadId    String?           @unique
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+}

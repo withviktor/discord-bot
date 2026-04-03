@@ -1,0 +1,87 @@
+import { MessageFlags, PermissionFlagsBits, SlashCommandBuilder } from "discord.js";
+import type { ChatInputCommandInteraction, GuildMember } from "discord.js";
+import { inject } from "tsyringe";
+import { Command } from "../../../core/decorators/index.js";
+import { RequirePermissions } from "../../../core/decorators/require-permissions.decorator.js";
+import type { ICommand } from "../../../core/interfaces/command.interface.js";
+import { errorEmbed, successEmbed } from "../../../core/utils/embeds.js";
+import { AuditLogService } from "../../../services/audit-log.service.js";
+import { ModerationService } from "../moderation.service.js";
+import { canModerate, replyError } from "../moderation.utils.js";
+
+@Command({ name: "kick", description: "Kick a member from the server" })
+@RequirePermissions(PermissionFlagsBits.KickMembers)
+export class KickCommand implements ICommand {
+  constructor(
+    @inject(ModerationService) private readonly moderation: ModerationService,
+    @inject(AuditLogService) private readonly auditLog: AuditLogService
+  ) {}
+
+  build(builder: SlashCommandBuilder) {
+    return builder
+      .addUserOption((opt) =>
+        opt.setName("user").setDescription("Member to kick").setRequired(true)
+      )
+      .addStringOption((opt) => opt.setName("reason").setDescription("Reason for the kick"));
+  }
+
+  async execute(interaction: ChatInputCommandInteraction): Promise<void> {
+    await interaction.deferReply({ flags: MessageFlags.Ephemeral });
+
+    if (!interaction.guild) return;
+
+    const targetUser = interaction.options.getUser("user", true);
+    const reason = interaction.options.getString("reason") ?? undefined;
+
+    let target: GuildMember;
+    try {
+      target = await interaction.guild.members.fetch(targetUser.id);
+    } catch {
+      await replyError(interaction, "That user is not in this server.");
+      return;
+    }
+
+    const err = canModerate(interaction, target);
+    if (err) {
+      await replyError(interaction, err);
+      return;
+    }
+
+    if (!target.kickable) {
+      await replyError(interaction, "I don't have permission to kick this user.");
+      return;
+    }
+
+    try {
+      await target.user.send({
+        embeds: [
+          errorEmbed(
+            `You were kicked from **${interaction.guild.name}**.${reason ? `\n**Reason:** ${reason}` : ""}`,
+            "👢 You've Been Kicked"
+          ),
+        ],
+      });
+    } catch { /* DMs disabled */ }
+
+    await target.kick(reason);
+
+    const modCase = await this.moderation.createCase({
+      guildId: interaction.guild.id,
+      userId: target.id,
+      moderatorId: interaction.user.id,
+      type: "KICK",
+      reason,
+    });
+
+    await this.auditLog.log(interaction.guild, modCase);
+
+    await interaction.editReply({
+      embeds: [
+        successEmbed(
+          `**${target.user.tag}** has been kicked. Case **#${modCase.id}**${reason ? `\n**Reason:** ${reason}` : ""}`,
+          "👢 Member Kicked"
+        ),
+      ],
+    });
+  }
+}

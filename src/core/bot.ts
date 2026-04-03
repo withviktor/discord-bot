@@ -36,7 +36,13 @@ export class BotClient {
 
   constructor(private readonly rootModule: Constructor) {
     this.client = new Client({
-      intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages],
+      intents: [
+        GatewayIntentBits.Guilds,
+        GatewayIntentBits.GuildMessages,
+        // Privileged intents — must be enabled in the Discord Developer Portal
+        GatewayIntentBits.GuildMembers,    // guildMemberAdd (welcome)
+        GatewayIntentBits.MessageContent,  // read message content (automod)
+      ],
     });
     this.rest = new REST().setToken(env.DISCORD_TOKEN);
   }
