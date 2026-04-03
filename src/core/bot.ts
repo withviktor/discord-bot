@@ -8,6 +8,7 @@ import {
 } from "discord.js";
 import { container } from "tsyringe";
 import { env } from "../env.js";
+import { LoggerService } from "../services/logger.service.js";
 import { COMMAND_METADATA_KEY } from "./decorators/command.decorator.js";
 import { EVENT_METADATA_KEY } from "./decorators/event.decorator.js";
 import type { ModuleOptions } from "./decorators/module.decorator.js";
@@ -16,6 +17,7 @@ import { PERMISSIONS_METADATA_KEY } from "./decorators/require-permissions.decor
 import type { ICommand } from "./interfaces/command.interface.js";
 import type { IEvent } from "./interfaces/event.interface.js";
 import type { OnBotDestroy, OnBotInit } from "./interfaces/lifecycle.interface.js";
+import { commandErrorEmbed, permissionDeniedEmbed } from "./utils/embeds.js";
 
 // biome-ignore lint/suspicious/noExplicitAny: constructor type requires any
 type Constructor = new (...args: any[]) => unknown;
@@ -29,6 +31,7 @@ interface ResolvedModule {
 export class BotClient {
   private readonly client: Client;
   private readonly rest: REST;
+  private readonly logger = new LoggerService();
 
   constructor(private readonly rootModule: Constructor) {
     this.client = new Client({
@@ -73,7 +76,7 @@ export class BotClient {
       body: commandData,
     });
 
-    console.log(`Registered ${commandData.length} slash command(s).`);
+    this.logger.info(`Registered ${commandData.length} slash command(s).`);
 
     // Register event handlers
     for (const EventClass of resolved.events) {
@@ -106,7 +109,7 @@ export class BotClient {
 
       if (requiredPerms?.length && !interaction.memberPermissions?.has(requiredPerms)) {
         await interaction.reply({
-          content: "You don't have permission to use this command.",
+          embeds: [permissionDeniedEmbed()],
           ephemeral: true,
         });
         return;
@@ -115,12 +118,9 @@ export class BotClient {
       try {
         await command.instance.execute(interaction);
       } catch (error) {
-        console.error(`Error executing command "${interaction.commandName}":`, error);
+        this.logger.error(`Error executing command "${interaction.commandName}":`, error);
 
-        const reply = {
-          content: "An error occurred while executing this command.",
-          ephemeral: true,
-        };
+        const reply = { embeds: [commandErrorEmbed()], ephemeral: true };
         if (interaction.replied || interaction.deferred) {
           await interaction.followUp(reply);
         } else {
