@@ -1,5 +1,11 @@
+import { config } from "dotenv";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 import { createEnv } from "@t3-oss/env-core";
 import { z } from "zod";
+
+// .env lives at the workspace root — three levels above packages/bot/src/env.ts
+config({ path: join(dirname(fileURLToPath(import.meta.url)), "../../../.env") });
 
 export const env = createEnv({
   server: {

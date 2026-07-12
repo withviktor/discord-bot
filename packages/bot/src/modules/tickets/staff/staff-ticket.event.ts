@@ -1,4 +1,4 @@
-import type { StaffTicketType } from "@prisma/client";
+import type { StaffTicketType } from "@btsl/database";
 import { MessageFlags } from "discord.js";
 import type { Interaction, ModalSubmitInteraction } from "discord.js";
 import { inject } from "tsyringe";

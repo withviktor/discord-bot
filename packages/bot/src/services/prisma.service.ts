@@ -1,5 +1,5 @@
 import { PrismaPg } from "@prisma/adapter-pg";
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient } from "@btsl/database";
 import { inject, injectable } from "tsyringe";
 import type { OnBotDestroy, OnBotInit } from "../core/interfaces/lifecycle.interface.js";
 import { env } from "../env.js";

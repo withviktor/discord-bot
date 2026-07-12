@@ -1,4 +1,3 @@
-import "dotenv/config";
 import "reflect-metadata";
 import { AppModule } from "./app.module.js";
 import { BotClient } from "./core/bot.js";

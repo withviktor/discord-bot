@@ -1,4 +1,3 @@
-import "dotenv/config";
 import "reflect-metadata";
 import { ShardingManager } from "discord.js";
 import { fileURLToPath } from "node:url";

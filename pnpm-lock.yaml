@@ -7,13 +7,38 @@ settings:
 importers:
 
   .:
+    devDependencies:
+      '@biomejs/biome':
+        specifier: ^1.9.4
+        version: 1.9.4
+
+  packages/api:
+    dependencies:
+      '@quinto/database':
+        specifier: workspace:*
+        version: link:../database
+    devDependencies:
+      '@types/node':
+        specifier: ^22.0.0
+        version: 22.19.17
+      tsup:
+        specifier: ^8.3.5
+        version: 8.5.1(jiti@2.6.1)(tsx@4.21.0)(typescript@5.9.3)
+      tsx:
+        specifier: ^4.19.2
+        version: 4.21.0
+      typescript:
+        specifier: ^5.7.3
+        version: 5.9.3
+
+  packages/bot:
     dependencies:
       '@prisma/adapter-pg':
         specifier: ^7.6.0
         version: 7.6.0
-      '@prisma/client':
-        specifier: ^7.0.0
-        version: 7.6.0(prisma@7.6.0(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@5.9.3))(typescript@5.9.3)
+      '@quinto/database':
+        specifier: workspace:*
+        version: link:../database
       '@t3-oss/env-core':
         specifier: ^0.12.0
         version: 0.12.0(typescript@5.9.3)(valibot@1.2.0(typescript@5.9.3))(zod@3.25.76)
@@ -24,7 +49,7 @@ importers:
         specifier: ^16.4.5
         version: 16.6.1
       nanoid:
-        specifier: ^5.1.7
+        specifier: 5.1.7
         version: 5.1.7
       pg:
         specifier: ^8.20.0
@@ -48,9 +73,6 @@ importers:
       '@types/pg':
         specifier: ^8.20.0
         version: 8.20.0
-      prisma:
-        specifier: ^7.0.0
-        version: 7.6.0(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@5.9.3)
       tsup:
         specifier: ^8.3.5
         version: 8.5.1(jiti@2.6.1)(tsx@4.21.0)(typescript@5.9.3)
@@ -60,6 +82,24 @@ importers:
       typescript:
         specifier: ^5.7.3
         version: 5.9.3
+
+  packages/database:
+    dependencies:
+      '@prisma/client':
+        specifier: ^7.0.0
+        version: 7.6.0(prisma@7.6.0(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@5.9.3))(typescript@5.9.3)
+      dotenv:
+        specifier: ^16.4.5
+        version: 16.6.1
+    devDependencies:
+      prisma:
+        specifier: ^7.0.0
+        version: 7.6.0(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@5.9.3)
+      typescript:
+        specifier: ^5.7.3
+        version: 5.9.3
+
+  packages/web: {}
 
 packages:
 

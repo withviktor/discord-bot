@@ -1,4 +1,4 @@
-import type { ModerationActionType } from "@prisma/client";
+import type { ModerationActionType } from "@btsl/database";
 import { generateId } from "../../core/utils/id.js";
 import { inject, injectable } from "tsyringe";
 import { PrismaService } from "../../services/prisma.service.js";

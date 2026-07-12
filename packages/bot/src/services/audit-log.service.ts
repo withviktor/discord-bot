@@ -1,4 +1,4 @@
-import type { ModerationActionType, ModerationCase } from "@prisma/client";
+import type { ModerationActionType, ModerationCase } from "@btsl/database";
 import { EmbedBuilder } from "discord.js";
 import type { Guild as DiscordGuild } from "discord.js";
 import { inject, injectable } from "tsyringe";

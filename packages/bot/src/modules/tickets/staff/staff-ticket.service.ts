@@ -1,4 +1,4 @@
-import type { StaffTicketType } from "@prisma/client";
+import type { StaffTicketType } from "@btsl/database";
 import { EmbedBuilder } from "discord.js";
 import type { Client } from "discord.js";
 import { inject, injectable } from "tsyringe";

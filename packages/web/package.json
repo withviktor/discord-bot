@@ -1,0 +1,10 @@
+{
+  "name": "@quinto/web",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "echo 'Web dashboard not yet implemented.'",
+    "build": "echo 'Web dashboard not yet implemented.'"
+  },
+  "dependencies": {}
+}

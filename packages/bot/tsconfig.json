@@ -1,0 +1,11 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "dist",
+    "rootDir": "src",
+    "paths": {
+      "@btsl/database": ["../database/src/index.ts"]
+    }
+  },
+  "include": ["src/**/*"]
+}
