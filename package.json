@@ -1,33 +1,25 @@
 {
-  "name": "quinto",
+  "name": "bot",
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "dev": "pnpm --filter @quinto/bot dev",
-    "dev:sharded": "pnpm --filter @quinto/bot dev:sharded",
-    "build": "pnpm --filter @quinto/bot build",
-    "start": "pnpm --filter @quinto/bot start",
-    "start:sharded": "pnpm --filter @quinto/bot start:sharded",
+    "dev": "pnpm --filter @bot/main dev",
+    "dev:sharded": "pnpm --filter @bot/main dev:sharded",
+    "build": "pnpm --filter @bot/main build",
+    "start": "pnpm --filter @bot/main start",
+    "start:sharded": "pnpm --filter @bot/main start:sharded",
     "lint": "biome check .",
     "format": "biome format --write .",
     "check": "biome check --write .",
     "db:start": "bash scripts/db.sh",
     "db:stop": "docker compose stop postgres",
-    "db:generate": "pnpm --filter @quinto/database db:generate",
-    "db:migrate": "pnpm --filter @quinto/database db:migrate",
-    "db:migrate:deploy": "pnpm --filter @quinto/database db:migrate:deploy",
-    "db:studio": "pnpm --filter @quinto/database db:studio"
+    "db:generate": "pnpm --filter @bot/database db:generate",
+    "db:migrate": "pnpm --filter @bot/database db:migrate",
+    "db:migrate:deploy": "pnpm --filter @bot/database db:migrate:deploy",
+    "db:studio": "pnpm --filter @bot/database db:studio"
   },
   "devDependencies": {
     "@biomejs/biome": "^1.9.4"
   },
-  "packageManager": "pnpm@11.12.0",
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "@biomejs/biome",
-      "@prisma/engines",
-      "esbuild",
-      "prisma"
-    ]
-  }
+  "packageManager": "pnpm@11.13.0"
 }

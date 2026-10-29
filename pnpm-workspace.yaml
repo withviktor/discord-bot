@@ -1,2 +1,7 @@
+allowBuilds:
+  "@biomejs/biome": true
+  "@prisma/engines": true
+  esbuild: true
+  prisma: true
 packages:
   - "packages/*"

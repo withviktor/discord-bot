@@ -1,4 +1,4 @@
-import type { StaffTicketType } from "@btsl/database";
+import type { StaffTicketType } from "@bot/database";
 import { EmbedBuilder } from "discord.js";
 import type { Client } from "discord.js";
 import { inject, injectable } from "tsyringe";
@@ -25,7 +25,7 @@ const TYPE_COLORS: Record<StaffTicketType, number> = {
 export class StaffTicketService {
   constructor(
     @inject(PrismaService) private readonly prisma: PrismaService,
-    @inject(LoggerService) private readonly logger: LoggerService
+    @inject(LoggerService) private readonly logger: LoggerService,
   ) {}
 
   async createTicket(
@@ -33,7 +33,7 @@ export class StaffTicketService {
     userId: string,
     guildId: string | null,
     type: StaffTicketType,
-    description: string
+    description: string,
   ) {
     const id = generateId("T");
 
@@ -55,9 +55,15 @@ export class StaffTicketService {
             .setTitle(`${TYPE_LABELS[type]} · ${id}`)
             .setDescription(description)
             .addFields(
-              { name: "From", value: `${user.tag} \`${userId}\``, inline: true },
-              ...(guildId ? [{ name: "Guild", value: `\`${guildId}\``, inline: true }] : []),
-              { name: "Status", value: "OPEN" }
+              {
+                name: "From",
+                value: `${user.tag} \`${userId}\``,
+                inline: true,
+              },
+              ...(guildId
+                ? [{ name: "Guild", value: `\`${guildId}\``, inline: true }]
+                : []),
+              { name: "Status", value: "OPEN" },
             )
             .setThumbnail(user.displayAvatarURL())
             .setTimestamp();
@@ -75,7 +81,10 @@ export class StaffTicketService {
           });
         }
       } catch (error) {
-        this.logger.error("Failed to post staff ticket to support channel:", error);
+        this.logger.error(
+          "Failed to post staff ticket to support channel:",
+          error,
+        );
       }
     }
 
@@ -86,7 +95,13 @@ export class StaffTicketService {
     return this.prisma.client.staffTicket.findUnique({ where: { id } });
   }
 
-  async updateStatus(id: string, status: "OPEN" | "IN_PROGRESS" | "RESOLVED" | "CLOSED") {
-    return this.prisma.client.staffTicket.update({ where: { id }, data: { status } });
+  async updateStatus(
+    id: string,
+    status: "OPEN" | "IN_PROGRESS" | "RESOLVED" | "CLOSED",
+  ) {
+    return this.prisma.client.staffTicket.update({
+      where: { id },
+      data: { status },
+    });
   }
 }

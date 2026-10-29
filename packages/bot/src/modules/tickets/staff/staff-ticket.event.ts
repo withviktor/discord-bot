@@ -1,4 +1,4 @@
-import type { StaffTicketType } from "@btsl/database";
+import type { StaffTicketType } from "@bot/database";
 import { MessageFlags } from "discord.js";
 import type { Interaction, ModalSubmitInteraction } from "discord.js";
 import { inject } from "tsyringe";
@@ -11,7 +11,10 @@ const VALID_TYPES = new Set(["bug", "misuse", "feature", "other"]);
 
 @Event({ name: "interactionCreate" })
 export class StaffTicketEvent implements IEvent {
-  constructor(@inject(StaffTicketService) private readonly staffTickets: StaffTicketService) {}
+  constructor(
+    @inject(StaffTicketService)
+    private readonly staffTickets: StaffTicketService,
+  ) {}
 
   async execute(interaction: Interaction): Promise<void> {
     if (!interaction.isModalSubmit()) return;
@@ -20,7 +23,9 @@ export class StaffTicketEvent implements IEvent {
     await this.handleReportSubmit(interaction);
   }
 
-  private async handleReportSubmit(interaction: ModalSubmitInteraction): Promise<void> {
+  private async handleReportSubmit(
+    interaction: ModalSubmitInteraction,
+  ): Promise<void> {
     await interaction.deferReply({ flags: MessageFlags.Ephemeral });
 
     const type = interaction.customId.split(":")[2] as string;
@@ -33,14 +38,14 @@ export class StaffTicketEvent implements IEvent {
       interaction.user.id,
       interaction.guildId,
       type.toUpperCase() as StaffTicketType,
-      description
+      description,
     );
 
     await interaction.editReply({
       embeds: [
         infoEmbed(
           `Your report has been submitted. Our team will review it shortly.\n\n**Ticket ID:** \`${ticket.id}\`\n\nYou'll receive a DM when the status changes.`,
-          "📬 Report Submitted"
+          "📬 Report Submitted",
         ),
       ],
     });

@@ -1,4 +1,4 @@
-import type { ModerationActionType, ModerationCase } from "@btsl/database";
+import type { ModerationActionType, ModerationCase } from "@bot/database";
 import { EmbedBuilder } from "discord.js";
 import type { Guild as DiscordGuild } from "discord.js";
 import { inject, injectable } from "tsyringe";
@@ -25,7 +25,7 @@ const ACTION_LABELS: Record<ModerationActionType, string> = {
 export class AuditLogService {
   constructor(
     @inject(ConfigService) private readonly config: ConfigService,
-    @inject(LoggerService) private readonly logger: LoggerService
+    @inject(LoggerService) private readonly logger: LoggerService,
   ) {}
 
   async log(guild: DiscordGuild, caseData: ModerationCase): Promise<void> {
@@ -40,13 +40,17 @@ export class AuditLogService {
         .setColor(ACTION_COLORS[caseData.type])
         .setTitle(`${ACTION_LABELS[caseData.type]} · Case #${caseData.id}`)
         .addFields(
-          { name: "User", value: `<@${caseData.userId}> \`${caseData.userId}\``, inline: true },
+          {
+            name: "User",
+            value: `<@${caseData.userId}> \`${caseData.userId}\``,
+            inline: true,
+          },
           {
             name: "Moderator",
             value: `<@${caseData.moderatorId}> \`${caseData.moderatorId}\``,
             inline: true,
           },
-          { name: "Reason", value: caseData.reason ?? "No reason provided" }
+          { name: "Reason", value: caseData.reason ?? "No reason provided" },
         )
         .setTimestamp(caseData.createdAt);
 

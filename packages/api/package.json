@@ -1,5 +1,5 @@
 {
-  "name": "@quinto/api",
+  "name": "@bot/api",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -10,7 +10,7 @@
     "start": "node dist/index.js"
   },
   "dependencies": {
-    "@quinto/database": "workspace:*"
+    "@bot/database": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",

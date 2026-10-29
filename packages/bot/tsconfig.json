@@ -4,7 +4,7 @@
     "outDir": "dist",
     "rootDir": "src",
     "paths": {
-      "@btsl/database": ["../database/src/index.ts"]
+      "@bot/database": ["../database/src/index.ts"]
     }
   },
   "include": ["src/**/*"]
