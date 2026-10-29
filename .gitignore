@@ -23,3 +23,5 @@ Thumbs.db
 .idea/
 *.swp
 *.swo
+
+packages/database/prisma/schema/migrations/**
