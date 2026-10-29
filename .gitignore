@@ -24,4 +24,4 @@ Thumbs.db
 *.swp
 *.swo
 
-packages/database/prisma/schema/migrations/**
+packages/database/prisma/schema/migrations/
